@@ -7,7 +7,7 @@ export const SliderContainer = styled.div`
   width: 100%;
   height: 100%;
   margin: auto;
-  background: white;
+  // background: white;
   .before {
     position: absolute;
     //下拉的时中间会有一段空白
