@@ -50,6 +50,14 @@ const Scroll = forwardRef((props, ref) => {//forwardRef 接受一个渲染函数
     }
   }, [onScroll, bScroll]);
 
+  // useEffect(() => {
+  //   if(!bScroll || !onScroll) return;
+  //   bScroll.on('scroll', onScroll)
+  //   return () => {
+  //     bScroll.off('scroll', onScroll);
+  //   }
+  // }, [onScroll, bScroll]);
+
   //上拉到底的判断，调用上拉刷新的函数
   useEffect(() => {
     if (!bScroll || !pullUp) return;
