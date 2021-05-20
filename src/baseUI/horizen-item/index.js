@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, memo } from 'react';
+import React, { useRef, useEffect, memo } from 'react';
 import { PropTypes } from 'prop-types';
 import styled from'styled-components';
 import style from '../../assets/global-style';
