@@ -3,11 +3,32 @@ import PropTypes from "prop-types"
 import BScroll from "better-scroll"
 import styled from'styled-components';
 
+import Loading from '../loading/index.js';
+import LoadingV2 from '../loading-v2/index.js';
+
 const ScrollContainer = styled.div`
   width: 100%;
   height: 100%;
   overflow: hidden;
 `
+const PullUpLoading = styled.div`
+  position: absolute;
+  left:0; right:0;
+  bottom: 5px;
+  width: 60px;
+  height: 60px;
+  margin: auto;
+  z-index: 100;
+`;
+
+export const PullDownLoading = styled.div`
+  position: absolute;
+  left:0; right:0;
+  top: 0px;
+  height: 30px;
+  margin: auto;
+  z-index: 100;
+`;
 
 const Scroll = forwardRef((props, ref) => {//forwardRef 接受一个渲染函数(接收 props 和 ref 参数并返回一个 React 节点)
 
@@ -16,7 +37,8 @@ const Scroll = forwardRef((props, ref) => {//forwardRef 接受一个渲染函数
 
   const scrollContaninerRef = useRef();
 
-  const { direction, click, refresh, bounceTop, bounceBottom, pullUp, pullDown, onScroll } = props;
+  const { direction, click, refresh, bounceTop, bounceBottom} = props;
+  const { pullUp, pullDown, onScroll, pullUpLoading, pullDownLoading } = props;
 
   useEffect(() => {
     const scroll = new BScroll(scrollContaninerRef.current, {
@@ -97,7 +119,7 @@ const Scroll = forwardRef((props, ref) => {//forwardRef 接受一个渲染函数
   // 通过使用 useImperativeHandle，以便用 scrollRef.current.refresh() 的方式刷新 scroll 组件
   useImperativeHandle(ref, () => ({
     // 给外界暴露 refresh 方法
-    refresh () {
+    refresh() {
       if (bScroll) {
         bScroll.refresh();
         bScroll.scrollTo(0, 0);
@@ -110,11 +132,17 @@ const Scroll = forwardRef((props, ref) => {//forwardRef 接受一个渲染函数
       }
     }
   }));
-
+  
+  const PullUpdisplayStyle = pullUpLoading ? {display: ""} : { display:"none" };
+  const PullDowndisplayStyle = pullDownLoading ? { display: ""} : { display:"none" };
 
   return (
     <ScrollContainer ref={scrollContaninerRef}>
       {props.children}
+      {/* 滑到底部加载动画 */}
+      <PullUpLoading style={ PullUpdisplayStyle }><Loading></Loading></PullUpLoading>
+      {/* 顶部下拉刷新动画 */}
+      <PullDownLoading style={ PullDowndisplayStyle }><LoadingV2></LoadingV2></PullDownLoading>
     </ScrollContainer>
   );
 })

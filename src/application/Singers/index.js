@@ -16,6 +16,8 @@ import {
 } from './store/actionCreators';
 import {connect} from 'react-redux';
 
+import Loading from '../../baseUI/loading';
+
 function Singers(props) {
   let [category, setCategory] = useState('');
   let [alpha, setAlpha] = useState('');
@@ -31,12 +33,8 @@ function Singers(props) {
     
   }
 
-  const { singerList,
-    //  enterLoading, pullUpLoading, pullDownLoading, pageCount 
-    } = props;
-  const { getHotSingerDispatch, updateDispatch,
-    //  pullDownRefreshDispatch, pullUpRefreshDispatch 
-    } = props;
+  const { singerList,pullUpLoading, pullDownLoading, pageCount, enterLoading } = props;
+  const { getHotSingerDispatch, updateDispatch, pullDownRefreshDispatch, pullUpRefreshDispatch } = props;
 
   useEffect(() => {
     getHotSingerDispatch();
@@ -66,6 +64,14 @@ function Singers(props) {
     )
   };
 
+  const handlePullUp = () => {
+    pullUpRefreshDispatch(category, alpha, category === '', pageCount);
+  };
+  
+  const handlePullDown = () => {
+    pullDownRefreshDispatch(category, alpha);
+  };
+
 
   return (
     <div>
@@ -74,9 +80,10 @@ function Singers(props) {
         <Horizen list={alphaTypes} title={"首字母:"} handleClick={val => handleUpdateAlpha(val)} oldVal={alpha}></Horizen>
       </NavContainer>
       <ListContainer>
-        <Scroll>
+        <Scroll pullUp={ handlePullUp } pullDown = { handlePullDown } pullUpLoading = { pullUpLoading } pullDownLoading = { pullDownLoading }>
           { renderSingerList() }
         </Scroll>
+        <Loading show={enterLoading}></Loading>
       </ListContainer>
     </div>
   )
@@ -100,25 +107,25 @@ const mapDispatchToProps = (dispatch) => {
       dispatch(getSingerList(category, alpha));
     },
     // 滑到最底部刷新部分的处理
-    // pullUpRefreshDispatch(category, alpha, hot, count) {
-    //   dispatch(changePullUpLoading(true));
-    //   dispatch(changePageCount(count+1));
-    //   if(hot){
-    //     dispatch(refreshMoreHotSingerList());
-    //   } else {
-    //     dispatch(refreshMoreSingerList(category, alpha));
-    //   }
-    // },
-    // //顶部下拉刷新
-    // pullDownRefreshDispatch(category, alpha) {
-    //   dispatch(changePullDownLoading(true));
-    //   dispatch(changePageCount(0));//属于重新获取数据
-    //   if(category === '' && alpha === ''){
-    //     dispatch(getHotSingerList());
-    //   } else {
-    //     dispatch(getSingerList(category, alpha));
-    //   }
-    // }
+    pullUpRefreshDispatch(category, alpha, hot, count) {
+      dispatch(changePullUpLoading(true));
+      dispatch(changePageCount(count+1));
+      if(hot){
+        dispatch(refreshMoreHotSingerList());
+      } else {
+        dispatch(refreshMoreSingerList(category, alpha));
+      }
+    },
+    //顶部下拉刷新
+    pullDownRefreshDispatch(category, alpha) {
+      dispatch(changePullDownLoading(true));
+      dispatch(changePageCount(0));//属于重新获取数据
+      if(category === '' && alpha === ''){
+        dispatch(getHotSingerList());
+      } else {
+        dispatch(getSingerList(category, alpha));
+      }
+    }
   }
 };
 
