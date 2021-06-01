@@ -1,10 +1,12 @@
-import React, { forwardRef,useState,useEffect, useRef, useImperativeHandle } from "react"
+import React, { forwardRef,useState,useEffect, useRef, useImperativeHandle,useMemo } from "react"
 import PropTypes from "prop-types"
 import BScroll from "better-scroll"
 import styled from'styled-components';
 
 import Loading from '../loading/index.js';
 import LoadingV2 from '../loading-v2/index.js';
+
+import { debounce } from "../../api/utils";
 
 const ScrollContainer = styled.div`
   width: 100%;
@@ -80,33 +82,50 @@ const Scroll = forwardRef((props, ref) => {//forwardRef 接受一个渲染函数
   //   }
   // }, [onScroll, bScroll]);
 
+  //useMemo() 返回一个 memoized 值。把“创建”函数和依赖项数组作为参数传入 useMemo，它仅会在某个依赖项改变时才重新计算 memoized 值。这种优化有助于避免在每次渲染时都进行高开销的计算。
+  //传入 useMemo 的函数会在渲染期间执行。请不要在这个函数内部执行与渲染无关的操作，诸如副作用这类的操作属于 useEffect 的适用范畴，而不是 useMemo。如果没有提供依赖项数组，useMemo 在每次渲染时都会计算新的值。
+  let pullUpDebounce = useMemo(() => {
+    return debounce(pullUp, 300)
+  }, [pullUp]);
+  // 千万注意，这里不能省略依赖，
+  // 不然拿到的始终是第一次 pullUp 函数的引用，相应的闭包作用域变量都是第一次的，产生闭包陷阱。下同。
+  
+  let pullDownDebounce = useMemo(() => {
+    return debounce(pullDown, 300)
+  }, [pullDown]);
+
+  // 之后直接调用 useMemo 返回的函数
+
   //上拉到底的判断，调用上拉刷新的函数
   useEffect(() => {
     if (!bScroll || !pullUp) return;
-    bScroll.on('scrollEnd', () => {
+    const handlePullUp=()=>{
       // 判断是否滑动到了底部
       if (bScroll.y <= bScroll.maxScrollY + 100){
-        pullUp();
+        pullUpDebounce();
       }
-    });
-    return () => {
-      bScroll.off('scrollEnd');
     }
-  }, [pullUp, bScroll]);
+    bScroll.on('scrollEnd', handlePullUp);
+    // 解绑
+    return () => {
+      bScroll.off('scrollEnd',handlePullUp);
+    }
+  }, [pullUp,pullUpDebounce, bScroll]);
 
   //下拉的判断，调用下拉刷新的函数
   useEffect(() => {
     if (!bScroll || !pullDown) return;
-    bScroll.on('touchEnd', (pos) => {
-      // 判断用户的下拉动作
-      if (pos.y > 50) {
-        pullDown();
+    const handlePullDown = (pos) => {
+      //判断用户的下拉动作
+      if(pos.y > 50) {
+        pullDownDebounce();
       }
-    });
+    };
+    bScroll.on('touchEnd', handlePullDown);
     return () => {
-      bScroll.off('touchEnd');
+      bScroll.off('touchEnd', handlePullDown);
     }
-  }, [pullDown, bScroll]);
+  }, [pullDown, pullDownDebounce, bScroll]);
 
   //每次重新渲染都要刷新实例，防止无法滑动
   useEffect(() => {
