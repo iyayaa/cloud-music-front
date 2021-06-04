@@ -11,13 +11,17 @@ import routes from './routes/index.js';
 import {GlobalStyle} from './style';
 import { IconStyle } from './assets/iconfont/iconfont';
 
+import { Data } from './application/Singers/data';
+
 function App() {
   return (
     <Provider store={store}>
       <HashRouter>
         <GlobalStyle></GlobalStyle>
         <IconStyle></IconStyle>
-        {renderRoutes(routes)}
+        <Data>
+          { renderRoutes(routes) }
+        </Data>
       </HashRouter>
     </Provider>
   );

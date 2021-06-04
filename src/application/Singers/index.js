@@ -1,4 +1,4 @@
-import React,{useState, useEffect} from 'react';
+import React,{ useEffect,useContext} from 'react';
 import Horizen from '../../baseUI/horizen-item';
 import Scroll from '../../baseUI/scroll';
 import { categoryTypes,alphaTypes } from '../../api/config';
@@ -19,26 +19,34 @@ import {connect} from 'react-redux';
 import Loading from '../../baseUI/loading';
 import  LazyLoad, {forceCheck} from 'react-lazyload';
 
+import {CategoryDataContext,CHANGE_ALPHA , CHANGE_CATEGORY } from './data.js'
+
 function Singers(props) {
-  let [category, setCategory] = useState('');
-  let [alpha, setAlpha] = useState('');
+  // let [category, setCategory] = useState('');
+  // let [alpha, setAlpha] = useState('');
+  const {data, dispatch} = useContext(CategoryDataContext);
+  const {category, alpha} = data.toJS();
 
   let handleUpdateAlpha = (val) => {
-    setAlpha(val);
-    updateDispatch(val, alpha);
+    // setAlpha(val);
+    dispatch({type: CHANGE_ALPHA, data: val});
+    updateDispatch(category, val);
   }
 
   let handleUpdateCatetory = (val) => {
-    setCategory(val);
-    updateDispatch(category, val);
+    // setCategory(val);
+    dispatch({type: CHANGE_CATEGORY, data: val});
+    updateDispatch(val,category);
     
   }
 
   const { singerList,pullUpLoading, pullDownLoading, pageCount, enterLoading } = props;
   const { getHotSingerDispatch, updateDispatch, pullDownRefreshDispatch, pullUpRefreshDispatch } = props;
 
-  useEffect(() => {
-    getHotSingerDispatch();
+  useEffect (() => {
+    if (!singerList.size) {
+      getHotSingerDispatch();
+    }
     // eslint-disable-next-line
   }, []);
 
