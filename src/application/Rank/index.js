@@ -7,6 +7,8 @@ import { Container, List,ListItem,SongList,EnterLoading } from './style';
 import Scroll from '../../baseUI/scroll/index.js';
 import Loading from '../../baseUI/loading';
 
+import { renderRoutes } from 'react-router-config';
+
 
 function Rank(props) {
 
@@ -33,7 +35,7 @@ function Rank(props) {
         list.map((item) => {
           return (
             <ListItem key={item.id} tracks={item.tracks}
-            // onClick={() => enterDetail(item.name)}
+            onClick={() => enterDetail(item)}
             >
               <div className="img_wrapper">
                 <img src={item.coverImgUrl} alt=""/>
@@ -47,6 +49,9 @@ function Rank(props) {
       } 
       </List>
     )
+  }
+  const enterDetail = (detail) => {
+    props.history.push (`/rank/${detail.id}`)
   }
 
   const renderSongList = (list) => {
@@ -75,7 +80,7 @@ function Rank(props) {
           { loading ? <EnterLoading><Loading></Loading></EnterLoading> : null }
         </div>
       </Scroll> 
-      {/* {renderRoutes(props.route.routes)} */}
+      {renderRoutes(props.route.routes)}
     </Container>
   );
 
