@@ -21,6 +21,8 @@ import  LazyLoad, {forceCheck} from 'react-lazyload';
 
 import {CategoryDataContext,CHANGE_ALPHA , CHANGE_CATEGORY } from './data.js'
 
+import { renderRoutes } from 'react-router-config';
+
 function Singers(props) {
   // let [category, setCategory] = useState('');
   // let [alpha, setAlpha] = useState('');
@@ -55,12 +57,16 @@ function Singers(props) {
 
     const list = singerList ? singerList.toJS(): [];
 
+    const enterDetail = (id)  => {
+      props.history.push(`/singers/${id}`);
+    };
+
     return (
       <List>
         {
           list.map((item, index) => {
             return (
-              <ListItem key={item.accountId+""+index}>
+              <ListItem key={item.accountId+""+index} onClick={() => enterDetail(item.id)}>
                 <div className="img_wrapper">
                 <LazyLoad placeholder={<img width="100%" height="100%" src={require('./singer.png').default} alt="music"/>}>
                   <img src={`${item.picUrl}?param=300x300`} width="100%" height="100%" alt="music"/>
@@ -96,6 +102,7 @@ function Singers(props) {
         </Scroll>
         <Loading show={enterLoading}></Loading>
       </ListContainer>
+      { renderRoutes(props.route.routes) }
     </div>
   )
 }

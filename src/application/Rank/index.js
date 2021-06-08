@@ -51,7 +51,7 @@ function Rank(props) {
     )
   }
   const enterDetail = (detail) => {
-    props.history.push (`/rank/${detail.id}`)
+    props.history.push(`/rank/${detail.id}`)
   }
 
   const renderSongList = (list) => {
