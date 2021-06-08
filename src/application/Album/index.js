@@ -1,4 +1,5 @@
 import React, {useState, useRef } from 'react';
+import { connect } from 'react-redux';
 import {Container, TopDesc, Menu, SongList, SongItem} from './style';
 import { CSSTransition } from 'react-transition-group';
 import  Header  from './../../baseUI/header/index';
@@ -7,6 +8,8 @@ import { getCount,getName } from './../../api/utils';
 
 import { HEADER_HEIGHT } from './../../api/config';
 import style from "../../assets/global-style";
+
+import { getAlbumList, changeEnterLoading } from './store/actionCreators';
 
 function Album(props) {
   const [showStatus, setShowStatus] = useState(true);
@@ -211,4 +214,20 @@ function Album(props) {
   )
 }
 
-export default React.memo(Album);
+// 映射 Redux 全局的 state 到组件的 props 上
+const mapStateToProps = (state) => ({
+  currentAlbum: state.getIn(['album', 'currentAlbum']),
+  enterLoading: state.getIn(['album', 'enterLoading']),
+});
+// 映射 dispatch 到 props 上
+const mapDispatchToProps = (dispatch) => {
+  return {
+    getAlbumDataDispatch(id) {
+      dispatch(changeEnterLoading(true));
+      dispatch(getAlbumList(id));
+    },
+  }
+};
+
+// 将 ui 组件包装成容器组件
+export default connect(mapStateToProps, mapDispatchToProps)(React.memo(Album));
