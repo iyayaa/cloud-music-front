@@ -1,9 +1,228 @@
-import React,{useState} from 'react';
+import React,{useState, useEffect, useRef, useCallback} from 'react';
 import { CSSTransition } from "react-transition-group";
-import { Container } from "./style";
+import { Container,ImgWrapper,CollectButton,SongListWrapper,BgLayer } from "./style";
+import  Header  from './../../baseUI/header/index';
+import Scroll from "../../baseUI/scroll/index";
+import SongsList from "../SongsList";
+import { HEADER_HEIGHT } from "./../../api/config";
+
+
 
 function Singer(props) {
   const [showStatus, setShowStatus] = useState(true);
+
+  const collectButton = useRef();
+  const imageWrapper = useRef();
+  const songScrollWrapper = useRef();
+  const songScroll = useRef();
+  const header = useRef();
+  const layer = useRef();
+  // 图片初始高度
+  const initialHeight = useRef(0);
+
+  // 往上偏移的尺寸，露出圆角
+  const OFFSET = 5;
+
+  //初始化时，将整个歌曲列表ScrollWrapper的 top 设置为正好处在图片下方
+  useEffect(() => {
+    let h = imageWrapper.current.offsetHeight;//获取歌手图片高度
+    initialHeight.current = h;
+
+    songScrollWrapper.current.style.top = `${h - OFFSET}px`;
+    // 把遮罩放在歌曲列表下面
+    layer.current.style.top = `${h - OFFSET}px`;
+    
+    songScroll.current.refresh();
+    // eslint-disable-next-line
+  }, []);
+
+  const handleScroll = useCallback( pos => {
+      // console.log(pos.y)
+      let height = initialHeight.current;//歌手图片高度
+      const newY = pos.y;
+      const imageDOM = imageWrapper.current;
+      const buttonDOM = collectButton.current;
+      const headerDOM = header.current;
+      const layerDOM = layer.current;
+
+      const minScrollY = -(height - OFFSET) + HEADER_HEIGHT;
+
+      // 指的是滑动距离占图片高度的百分比
+      const percent = Math.abs(newY/height);
+
+      //处理往下拉的情况，效果：图片背景放大，按钮跟着偏移
+      if (newY > 0) {
+        imageDOM.style["transform"] = `scale(${1 + percent})`;
+        buttonDOM.style["transform"] = `translate3d(0, ${newY}px, 0)`;
+        //底部白色
+        layerDOM.style.top = `${height - OFFSET + newY}px`;
+      } 
+
+      //往上滑动，但是还没超过 Header 部分
+      else if (newY >= minScrollY) {
+        // console.log('minScrollY:',minScrollY)
+        layerDOM.style.top = `${height - OFFSET - Math.abs(newY)}px`;
+        
+        // 按钮跟着移动且渐渐变透明
+        buttonDOM.style["transform"] = `translate3d(0, ${newY}px, 0)`;
+        buttonDOM.style["opacity"] = `${1 - percent * 2}`;
+
+        // 下拉回去的时候ScrollList层叠比图片高
+        // layerDOM.style.zIndex = 1;
+        imageDOM.style.paddingTop = "75%";
+        imageDOM.style.height = 0;
+        // imageDOM.style.zIndex = -1;
+        imageDOM.style.zIndex = 50;
+      } 
+
+      //往上滑动，但是遮罩超过 Header 部分
+      else if (newY < minScrollY) {
+        // 往上滑动，但是超过 Header 部分
+        layerDOM.style.top = `${HEADER_HEIGHT - OFFSET}px`;
+        // layerDOM.style.zIndex = 1;
+        // 防止歌单内容遮住 Header
+        headerDOM.style.zIndex = 100;
+        // 图片高度与 Header 一致,提升zIndex遮住歌单内容
+        imageDOM.style.height = `${HEADER_HEIGHT}px`;
+        imageDOM.style.paddingTop = 0;
+        imageDOM.style.zIndex = 99;
+      }
+
+  },[])
+
+  const setShowStatusFalse = useCallback(() => {
+    setShowStatus(false);
+  }, []);
+
+  //mock
+  const artist = {
+    picUrl: "https://p2.music.126.net/W__FCWFiyq0JdPtuLJoZVQ==/109951163765026271.jpg",
+    name: "薛之谦",
+    hotSongs: [
+      {
+        name: "我好像在哪见过你",
+        ar: [{name: "薛之谦"}],
+        al: {
+          name: "薛之谦专辑"
+        }
+      },
+      {
+        name: "我好像在哪见过你",
+        ar: [{name: "薛之谦"}],
+        al: {
+          name: "薛之谦专辑"
+        }
+      },
+      {
+        name: "我好像在哪见过你",
+        ar: [{name: "薛之谦"}],
+        al: {
+          name: "薛之谦专辑"
+        }
+      },
+      {
+        name: "我好像在哪见过你",
+        ar: [{name: "薛之谦"}],
+        al: {
+          name: "薛之谦专辑"
+        }
+      },
+      {
+        name: "我好像在哪见过你",
+        ar: [{name: "薛之谦"}],
+        al: {
+          name: "薛之谦专辑"
+        }
+      },
+      {
+        name: "我好像在哪见过你",
+        ar: [{name: "薛之谦"}],
+        al: {
+          name: "薛之谦专辑"
+        }
+      },
+      {
+        name: "我好像在哪见过你",
+        ar: [{name: "薛之谦"}],
+        al: {
+          name: "薛之谦专辑"
+        }
+      },
+      {
+        name: "我好像在哪见过你",
+        ar: [{name: "薛之谦"}],
+        al: {
+          name: "薛之谦专辑"
+        }
+      },
+      {
+        name: "我好像在哪见过你",
+        ar: [{name: "薛之谦"}],
+        al: {
+          name: "薛之谦专辑"
+        }
+      },
+      {
+        name: "我好像在哪见过你",
+        ar: [{name: "薛之谦"}],
+        al: {
+          name: "薛之谦专辑"
+        }
+      },{
+        name: "我好像在哪见过你",
+        ar: [{name: "薛之谦"}],
+        al: {
+          name: "薛之谦专辑"
+        }
+      },
+      {
+        name: "我好像在哪见过你",
+        ar: [{name: "薛之谦"}],
+        al: {
+          name: "薛之谦专辑"
+        }
+      },{
+        name: "我好像在哪见过你",
+        ar: [{name: "薛之谦"}],
+        al: {
+          name: "薛之谦专辑"
+        }
+      },
+      {
+        name: "我好像在哪见过你",
+        ar: [{name: "薛之谦"}],
+        al: {
+          name: "薛之谦专辑"
+        }
+      },{
+        name: "我好像在哪见过你",
+        ar: [{name: "薛之谦"}],
+        al: {
+          name: "薛之谦专辑"
+        }
+      },
+      {
+        name: "我好像在哪见过你",
+        ar: [{name: "薛之谦"}],
+        al: {
+          name: "薛之谦专辑"
+        }
+      },{
+        name: "我好像在哪见过你",
+        ar: [{name: "薛之谦"}],
+        al: {
+          name: "薛之谦专辑"
+        }
+      },
+      {
+        name: "我好像在哪见过你",
+        ar: [{name: "薛之谦"}],
+        al: {
+          name: "薛之谦专辑"
+        }
+      }
+    ]
+  }
   return (
     <CSSTransition
       in={showStatus}
@@ -14,7 +233,23 @@ function Singer(props) {
       onExited={() => props.history.goBack()}
     >
       <Container>
-        Singer
+        <Header title={artist.name} handleClick={setShowStatusFalse} ref={header}></Header>
+        <ImgWrapper ref={imageWrapper} bgUrl={artist.picUrl}>
+          <div className="filter"></div>
+        </ImgWrapper>
+        <CollectButton ref={collectButton}>
+          <i className="iconfont">&#xe62d;</i>
+          <span className="text"> 收藏 </span>
+        </CollectButton>
+        <BgLayer ref={layer}></BgLayer>
+        <SongListWrapper ref={songScrollWrapper}>
+          {/* 歌曲列表部分 */}
+          <Scroll ref={songScroll}  onScroll={handleScroll}>
+            <SongsList songs={artist.hotSongs} showCollect={false} >
+
+            </SongsList>
+          </Scroll>
+        </SongListWrapper>
       </Container>
     </CSSTransition>
   )
