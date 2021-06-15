@@ -15,6 +15,10 @@ import NormalPlayer from './normalPlayer';
 
 function Player(props) {
 
+  const { fullScreen } = props;
+
+  const { toggleFullScreenDispatch } = props;
+
   const currentSong = {
     al: { picUrl: "https://p1.music.126.net/JL_id1CFwNJpzgrXwemh4Q==/109951164172892390.jpg" },
     name: "木偶人",
@@ -23,8 +27,8 @@ function Player(props) {
 
   return (
     <div>
-      <NormalPlayer song={currentSong}></NormalPlayer>
-      <MiniPlayer song={currentSong}/>
+      <MiniPlayer song={currentSong} fullScreen={fullScreen} toggleFullScreen={toggleFullScreenDispatch}/>
+      <NormalPlayer song={currentSong} fullScreen={fullScreen} toggleFullScreen={toggleFullScreenDispatch}></NormalPlayer>
     </div>
   )
 }
@@ -47,7 +51,7 @@ const mapDispatchToProps = dispatch => {
     togglePlayingdispatch(data) {
       dispatch(changePlayingState(data));
     },
-    toggleFullScreendispatch(data) {
+    toggleFullScreenDispatch(data) {
       dispatch(changeFullScreen(data));
     },
     togglePlayListdispatch(data) {

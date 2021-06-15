@@ -1,11 +1,60 @@
-import React from "react";
+import React,{useRef} from "react";
+import { CSSTransition } from 'react-transition-group';
+import animations from "create-keyframe-animation";
 import { getName } from "../../../api/utils";
 import { NormalPlayerContainer, Top, Middle, Bottom, Operators, CDWrapper, } from "./style";
 
 function NormalPlayer(props) {
-  const {song} =  props;
+  const {song, fullScreen} =  props;
+  const { toggleFullScreenDispatch } = props;
+
+  const normalPlayerRef = useRef();
+  const cdWrapperRef = useRef();
+
+  const enter = () => {
+    normalPlayerRef.current.style.display = "block";
+    const { x, y, scale } = _getPosAndScale();// 获取 miniPlayer 图片中心相对 normalPlayer 唱片中心的偏移
+    let animation = {
+      0: {
+        transform: `translate3d(${x}px,${y}px,0) scale(${scale})`
+      },
+      60: {
+        transform: `translate3d(0, 0, 0) scale(1.1)`
+      },
+      100: {
+        transform: `translate3d(0, 0, 0) scale(1)`
+      }
+    };
+    animations.registerAnimation({
+      name: "move",
+      animation,
+      presets: {
+        duration: 400,
+        easing: "linear"
+      }
+    });
+    animations.runAnimation(cdWrapperRef.current, "move");
+  };
+
+  const afterEnter = () => {
+    // 进入后解绑帧动画
+    const cdWrapperDom = cdWrapperRef.current;
+    animations.unregisterAnimation("move");
+    cdWrapperDom.style.animation = "";
+  };
+
   return (
-    <NormalPlayerContainer>
+    <CSSTransition
+    classNames="normal"
+    in={fullScreen}
+    timeout={400}
+    mountOnEnter
+    onEnter={enter}
+    onEntered={afterEnter}
+    //onExit={leave}
+    //onExited={afterLeave}
+  >
+    <NormalPlayerContainer ref={normalPlayerRef}>
       {/* 整个播放器背景 */}
       <div className="background">
         <img
@@ -24,7 +73,7 @@ function NormalPlayer(props) {
         <h1 className="title">{song.name}</h1>
         <h1 className="subtitle">{getName(song.ar)}</h1>
       </Top>
-      <Middle>
+      <Middle ref={cdWrapperRef}>
         <CDWrapper>
           <div className="cd">
             <img
@@ -55,6 +104,25 @@ function NormalPlayer(props) {
         </Operators>
       </Bottom>
     </NormalPlayerContainer>
+    </CSSTransition>
   );
 }
+
+// 计算偏移的辅助函数。 miniPlayer 图片中心相对 normalPlayer 唱片（Middle）中心的偏移
+const _getPosAndScale = () => {
+  const targetWidth = 40; //mini 圆半径
+  const paddingLeft = 40;//mini 圆心X  paddingLeft 20 + 半径20
+  const paddingBottom = 30; //mini 圆心Y
+  const paddingTop = 80; //Middle距顶部80
+  const width = window.innerWidth * 0.8; //cd 的半径
+  const scale = targetWidth /width;
+  // 两个圆心的横坐标距离和纵坐标距离
+  const x = -(window.innerWidth/ 2 - paddingLeft);
+  const y = window.innerHeight - paddingTop - width / 2 - paddingBottom;
+  return {
+    x,
+    y,
+    scale
+  };
+};
 export default React.memo(NormalPlayer);
