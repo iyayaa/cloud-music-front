@@ -152,9 +152,9 @@ export const ProgressWrapper = styled.div`
   .time {
     color: ${style["font-color-desc"]};
     font-size: ${style["font-size-s"]};
-    flex: 0 0 30px;
+    flex: 0 0 36px;
     line-height: 30px;
-    width: 30px;
+    // width: 30px;
     &.time-l {
       text-align: left;
     }
@@ -163,7 +163,7 @@ export const ProgressWrapper = styled.div`
     }
   }
   .progress-bar-wrapper {
-    flex: 1;
+    flex: 1;//当 flex 取值为一个非负数字，则该数字为 flex-grow 值，flex-shrink 取 1，flex-basis 取 0%
   }
 `;
 export const Operators = styled.div`

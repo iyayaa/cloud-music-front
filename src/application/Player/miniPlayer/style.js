@@ -54,7 +54,8 @@ export const MiniPlayerContainer = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: center;
-    flex: 1;//当 flex 取值为一个长度或百分比，则视为 flex-basis 值，flex-grow 取 1，flex-shrink 取 1
+    flex: 1;//当 flex 取值为一个长度或百分比，则视为 flex-basis 值，flex-grow 取 1，flex-shrink 取 1。
+    //当 flex 取值为一个非负数字，则该数字为 flex-grow 值，flex-shrink 取 1，flex-basis 取 0%
     line-height: 20px;
     overflow: hidden;
     .name {
