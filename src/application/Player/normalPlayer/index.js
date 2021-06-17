@@ -1,4 +1,4 @@
-import React,{useRef} from "react";
+import React,{useRef,useState} from "react";
 import { CSSTransition } from 'react-transition-group';
 import animations from "create-keyframe-animation";
 import { getName } from "../../../api/utils";
@@ -7,8 +7,14 @@ import { prefixStyle } from "../../../api/utils";
 import ProgressBar from "../../../baseUI/progress-bar/index.js";
 
 function NormalPlayer(props) {
-  const {song, fullScreen} =  props;
-  const { toggleFullScreen } = props;
+  const { currentSong:song, fullScreen,playing, currentIndex,} =  props;
+  const { 
+    toggleFullScreenDispatch:toggleFullScreen, 
+    // clickPlaying:togglePlayingDispatch, 
+    // changeCurrentIndexDispatch, changeCurrentDispatch 
+  } = props;
+
+  // let song = immutableCurrentSong.toJS();
 
   const normalPlayerRef = useRef();
   const cdWrapperRef = useRef();
@@ -65,6 +71,13 @@ function NormalPlayer(props) {
     // 不置为 none 现在全屏播放器页面还是存在
     normalPlayerRef.current.style.display = "none";
   };
+
+  //当前播放时间
+  const [currentTime, setCurrentTime] = useState(0);
+  //歌曲总时长
+  const [duration, setDuration] = useState(0);
+  //歌曲播放进度
+  let percent = isNaN(currentTime/duration) ? 0 : currentTime/duration;
 
   return (
     <CSSTransition
