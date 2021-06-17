@@ -39,8 +39,12 @@ function Player(props) {
     });
     togglePlayingDispatch(true);//播放状态
     // setCurrentTime(0);//从头开始播放
-    // setDuration((current.dt/ 1000) | 0);//时长
+    // setDuration((current.dt/ 1000) | 0);//时长 
   },[]);
+
+  useEffect(() => {
+    playing ? audioRef.current.play() : audioRef.current.pause();
+  }, [playing]);
 
   //切换播放状态
   const clickPlaying = (e, state) => {
@@ -51,14 +55,14 @@ function Player(props) {
   return (
     <div>
       { isEmptyObject(currentSong) ? null : 
-        (<MiniPlayer song={currentSong} fullScreen={fullScreen} toggleFullScreen={toggleFullScreenDispatch}
+        <MiniPlayer song={currentSong} fullScreen={fullScreen} toggleFullScreen={toggleFullScreenDispatch}
           playing={playing} clickPlaying={clickPlaying}
-        />)
+        />
       }
       { isEmptyObject(currentSong) ? null :
-        (<NormalPlayer currentSong={currentSong} fullScreen={fullScreen} toggleFullScreenDispatch={toggleFullScreenDispatch}
+        <NormalPlayer currentSong={currentSong} fullScreen={fullScreen} toggleFullScreenDispatch={toggleFullScreenDispatch}
           playing={playing} clickPlaying={clickPlaying}
-        ></NormalPlayer>)
+        ></NormalPlayer>
       }
       <audio ref={audioRef}></audio>
     </div>

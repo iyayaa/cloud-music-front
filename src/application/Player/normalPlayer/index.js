@@ -10,7 +10,7 @@ function NormalPlayer(props) {
   const { currentSong:song, fullScreen,playing, currentIndex,} =  props;
   const { 
     toggleFullScreenDispatch:toggleFullScreen, 
-    // clickPlaying:togglePlayingDispatch, 
+    clickPlaying, 
     // changeCurrentIndexDispatch, changeCurrentDispatch 
   } = props;
 
@@ -113,11 +113,12 @@ function NormalPlayer(props) {
         <CDWrapper>
           <div className="cd">
             <img
-              className="image play"
+              className={`image play ${playing ? '': 'pause'}`}
               src={song.al.picUrl + "?param=400x400"}
               alt=""
             />
           </div>
+          
         </CDWrapper>
       </Middle>
       <Bottom className="bottom">
@@ -136,7 +137,14 @@ function NormalPlayer(props) {
             <i className="iconfont">&#xe6e1;</i>
           </div>
           <div className="icon i-center">
-            <i className="iconfont">&#xe723;</i>
+            {/* 中间暂停按钮 */}
+            <i
+              className="iconfont"
+              onClick={e => clickPlaying(e, !playing)}
+              dangerouslySetInnerHTML={{
+                __html: playing ? "&#xe723;" : "&#xe731;"
+              }}
+            ></i>
           </div>
           <div className="icon i-right">
             <i className="iconfont">&#xe718;</i>

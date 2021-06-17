@@ -43,18 +43,7 @@ export const getName = list => {
 };
 
 // 判断一个对象是否为空
-// export const isEmptyObject = obj => !obj || Object.keys(obj).length === 0;
-export const isEmptyObject = obj =>
-  { 
-    
-    let end = !obj || Object.keys(obj).length === 0;
-    // console.log(end)
-    // if(end == false){
-    //   console.log(obj)
-    //   console.log(Object.keys(obj).length)
-    // }
-    return end;
-  }
+export const isEmptyObject = obj => !obj || Object.keys(obj).length === 0;
 
 // 给 css3 相关属性增加浏览器前缀，处理浏览器兼容性问题
 let elementStyle = document.createElement("div").style;
