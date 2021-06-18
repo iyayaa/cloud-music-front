@@ -10,7 +10,7 @@ function NormalPlayer(props) {
   const { currentSong:song, fullScreen,playing, percent, duration, currentTime } =  props;
   const { 
     toggleFullScreenDispatch:toggleFullScreen, 
-    clickPlaying, onProgressChange
+    clickPlaying, onProgressChange,handlePrev, handleNext
     // changeCurrentIndexDispatch, changeCurrentDispatch 
   } = props;
 
@@ -132,7 +132,7 @@ function NormalPlayer(props) {
           <div className="icon i-left" >
             <i className="iconfont">&#xe625;</i>
           </div>
-          <div className="icon i-left">
+          <div className="icon i-left"  onClick={handlePrev}>
             <i className="iconfont">&#xe6e1;</i>
           </div>
           <div className="icon i-center">
@@ -145,7 +145,7 @@ function NormalPlayer(props) {
               }}
             ></i>
           </div>
-          <div className="icon i-right">
+          <div className="icon i-right" onClick={handleNext}>
             <i className="iconfont">&#xe718;</i>
           </div>
           <div className="icon i-right">

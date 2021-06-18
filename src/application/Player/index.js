@@ -18,7 +18,7 @@ import { getSongUrl,isEmptyObject } from "../../api/utils";
 function Player(props) {
   
 
-  const { fullScreen,playing,currentSong:immutableCurrentSong } = props;
+  const { fullScreen,playing,currentSong:immutableCurrentSong,currentIndex } = props;
 
   const { toggleFullScreenDispatch,togglePlayingDispatch,changeCurrentIndexDispatch,changeCurrentDispatch } = props;
   
@@ -30,16 +30,27 @@ function Player(props) {
   const [currentTime, setCurrentTime] = useState(0);
   //歌曲总时长
   const [duration, setDuration] = useState(0);
+  //记录当前的歌曲，以便于下次重渲染时比对是否是一首歌
+  const [preSong, setPreSong] = useState({});
   //歌曲播放进度
   let percent = isNaN(currentTime/duration) ? 0 : currentTime/duration;
+
+  useEffect(() => {
+    changeCurrentIndexDispatch(0);
+  }, [])
   
   useEffect(() => {
     
-    if(!currentSong) return;
+    if(
+      !playList.length ||
+      currentIndex === -1 ||
+      !playList[currentIndex] ||
+      playList[currentIndex].id === preSong.id
+      ) return;
     
-    changeCurrentIndexDispatch(0);//currentIndex默认为-1，临时改成0
-    let current = playList[0];
+    let current = playList[currentIndex];
     changeCurrentDispatch(current);//赋值currentSong
+    setPreSong(current);
     audioRef.current.src = getSongUrl(current.id);
     setTimeout(() => {
       audioRef.current.play();
@@ -48,7 +59,7 @@ function Player(props) {
     setCurrentTime(0);//从头开始播放
     // setDuration((current.dt/1000) | 0);//时长 |0 向下取整
     setDuration(Math.floor(current.dt/1000));//时长 
-  },[]);
+  },[playList, currentIndex]);
 
   useEffect(() => {
     playing ? audioRef.current.play() : audioRef.current.pause();
@@ -72,18 +83,51 @@ function Player(props) {
       togglePlayingDispatch(true);
     }
   };
+
+  //一首歌循环
+  const handleLoop = () => {
+    audioRef.current.currentTime = 0;
+    // changePlayingState(true);
+    togglePlayingDispatch(true);
+    audioRef.current.play();
+  };
+  //上一首
+  const handlePrev = () => {
+    //播放列表只有一首歌时单曲循环
+    if (playList.length === 1) {
+      handleLoop();
+      return;
+    }
+    let index = currentIndex - 1;
+    if (index < 0) index = playList.length - 1;
+    if (!playing) togglePlayingDispatch(true);
+    changeCurrentIndexDispatch(index);
+  };
+  //下一首
+  const handleNext = () => {
+    //播放列表只有一首歌时单曲循环
+    if (playList.length === 1) {
+      handleLoop();
+      return;
+    }
+    let index = currentIndex + 1;
+    if (index === playList.length) index = 0;
+    if (!playing) togglePlayingDispatch(true);
+    changeCurrentIndexDispatch(index);
+  };
     
   return (
     <div>
       { isEmptyObject(currentSong) ? null : 
         <MiniPlayer song={currentSong} fullScreen={fullScreen} toggleFullScreen={toggleFullScreenDispatch}
-          playing={playing} clickPlaying={clickPlaying}
+          playing={playing} clickPlaying={clickPlaying} percent={percent}
         />
       }
       { isEmptyObject(currentSong) ? null :
         <NormalPlayer currentSong={currentSong} fullScreen={fullScreen} toggleFullScreenDispatch={toggleFullScreenDispatch}
           playing={playing} clickPlaying={clickPlaying}
           duration={duration} currentTime={currentTime} percent={percent} onProgressChange={onProgressChange}
+          handlePrev={handlePrev}  handleNext={handleNext}
         ></NormalPlayer>
       }
       <audio ref={audioRef} onTimeUpdate={updateTime}></audio>
