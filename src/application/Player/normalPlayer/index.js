@@ -1,17 +1,17 @@
-import React,{useRef,useState} from "react";
+import React,{cloneElement, useEffect, useRef,useState} from "react";
 import { CSSTransition } from 'react-transition-group';
 import animations from "create-keyframe-animation";
 import { getName } from "../../../api/utils";
 import { NormalPlayerContainer, Top, Middle, Bottom, Operators, CDWrapper,ProgressWrapper } from "./style";
 import { prefixStyle,formatPlayTime  } from "../../../api/utils";
 import ProgressBar from "../../../baseUI/progress-bar/index.js";
+import { playMode } from '../../../api/config';
 
 function NormalPlayer(props) {
-  const { currentSong:song, fullScreen,playing, percent, duration, currentTime } =  props;
+  const { currentSong:song, fullScreen,playing, percent, duration, currentTime,mode } =  props;
   const { 
     toggleFullScreenDispatch:toggleFullScreen, 
-    clickPlaying, onProgressChange,handlePrev, handleNext
-    // changeCurrentIndexDispatch, changeCurrentDispatch 
+    clickPlaying, onProgressChange,handlePrev, handleNext,changeMode
   } = props;
 
 
@@ -71,12 +71,30 @@ function NormalPlayer(props) {
   };
   
 
-  // //当前播放时间
-  // const [currentTime, setCurrentTime] = useState(0);
-  // //歌曲总时长
-  // const [duration, setDuration] = useState(0);
-  // //歌曲播放进度
-  // let percent = isNaN(currentTime/duration) ? 0 : currentTime/duration;
+  const getModeIcon = () => {
+    console.log('sdfa')
+    let content;
+    if (mode === playMode.sequence) {
+      content = "&#xe625;";
+    } else if (mode === playMode.loop) {
+      content = "&#xe653;";
+    } else {
+      content = "&#xe61b;";
+    }
+    return content;
+  };
+
+  //设置模式图标
+  const [content,setContent] = useState('')
+  useEffect(()=>{
+    if (mode === playMode.sequence) {
+      setContent("&#xe625;")
+    } else if (mode === playMode.loop) {
+      setContent("&#xe653;")
+    } else {
+      setContent("&#xe61b;")
+    }
+  },[mode]);
 
   return (
     <CSSTransition
@@ -129,8 +147,10 @@ function NormalPlayer(props) {
           <div className="time time-r">{formatPlayTime(duration)}</div>
         </ProgressWrapper>
         <Operators>
-          <div className="icon i-left" >
-            <i className="iconfont">&#xe625;</i>
+        {/* <div dangerouslySetInnerHTML={{ __html:tty }}></div> */}
+        
+          <div className="icon i-left" onClick={changeMode}>
+            <i className="iconfont" dangerouslySetInnerHTML={{ __html: content}} ></i>
           </div>
           <div className="icon i-left"  onClick={handlePrev}>
             <i className="iconfont">&#xe6e1;</i>
