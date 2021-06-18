@@ -78,3 +78,12 @@ export function prefixStyle(style) {
 export const getSongUrl = id => {
   return `https://music.163.com/song/media/outer/url?id=${id}.mp3`;
 };
+//转换歌曲播放时间
+export const formatPlayTime = interval => {
+  // interval = interval | 0;// |0表示向下取整
+  interval = Math.floor(interval);// |0表示向下取整
+  // const minute = (interval / 60) | 0;
+  const minute = Math.floor(interval / 60);
+  const second = (interval%60).toString().padStart(2, "0");//padStart() 用另一个字符串填充当前字符串。从当前字符串的左侧开始填充。
+  return `${minute}:${second}`;
+};

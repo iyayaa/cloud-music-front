@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState } from 'react';
 import styled from'styled-components';
 import style from '../../assets/global-style';
-// import { prefixStyle } from './../../api/utils';
+import { prefixStyle } from './../../api/utils';
 
 const ProgressBarWrapper = styled.div`
   height: 30px;
@@ -38,6 +38,10 @@ const ProgressBarWrapper = styled.div`
 
 function ProgressBar(props) {
 
+  const { percent } = props;
+
+  const { percentChange } = props;
+
   const progressBar = useRef();
   const progress = useRef();
   const progressBtn = useRef();
@@ -70,19 +74,43 @@ function ProgressBar(props) {
     const barWidth = progressBar.current.clientWidth - progressBtnWidth; 
     const offsetWidth = Math.min(Math.max(0, touch.left + deltaX), barWidth);
     _offset(offsetWidth);
+    
   }
 
   const progressTouchEnd = (e) => {
     const endTouch = JSON.parse(JSON.stringify(touch));
     endTouch.initiated = false;
     setTouch(endTouch);
+    _changePercent();
   }
+
+  //点击和滑动结束事件改变percent
+  const _changePercent = () => {
+    const barWidth = progressBar.current.clientWidth - progressBtnWidth;
+    const curPercent = progress.current.clientWidth / barWidth;
+    percentChange(curPercent);
+  }
+
   //点击进度条时
   const progressClick = (e) => {
     const rect = progressBar.current.getBoundingClientRect();//Element.getBoundingClientRect() 方法返回元素的大小及其相对于视口的位置。
     const offsetWidth = e.pageX - rect.left;
     _offset(offsetWidth);
+    _changePercent();
   };
+
+  const transform = prefixStyle('transform');
+  //监听percent
+  
+  useEffect(() => {
+    if(percent >= 0 && percent <= 1 && !touch.initiated) {
+      const barWidth = progressBar.current.clientWidth - progressBtnWidth;
+      const offsetWidth = percent * barWidth;
+      progress.current.style.width = `${offsetWidth}px`;
+      progressBtn.current.style[transform] = `translate3d(${offsetWidth}px, 0, 0)`;
+    }
+    // eslint-disable-next-line
+  }, [percent]);
 
   return (
     <ProgressBarWrapper>

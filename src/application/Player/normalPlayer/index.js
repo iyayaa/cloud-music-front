@@ -3,18 +3,17 @@ import { CSSTransition } from 'react-transition-group';
 import animations from "create-keyframe-animation";
 import { getName } from "../../../api/utils";
 import { NormalPlayerContainer, Top, Middle, Bottom, Operators, CDWrapper,ProgressWrapper } from "./style";
-import { prefixStyle } from "../../../api/utils";
+import { prefixStyle,formatPlayTime  } from "../../../api/utils";
 import ProgressBar from "../../../baseUI/progress-bar/index.js";
 
 function NormalPlayer(props) {
-  const { currentSong:song, fullScreen,playing, currentIndex,} =  props;
+  const { currentSong:song, fullScreen,playing, percent, duration, currentTime } =  props;
   const { 
     toggleFullScreenDispatch:toggleFullScreen, 
-    clickPlaying, 
+    clickPlaying, onProgressChange
     // changeCurrentIndexDispatch, changeCurrentDispatch 
   } = props;
 
-  // let song = immutableCurrentSong.toJS();
 
   const normalPlayerRef = useRef();
   const cdWrapperRef = useRef();
@@ -51,7 +50,6 @@ function NormalPlayer(props) {
     cdWrapperDom.style.animation = "";
   };
 
-
   //离开动画的逻辑:
   const transform = prefixStyle("transform");
   const leave = () => {
@@ -71,13 +69,14 @@ function NormalPlayer(props) {
     // 不置为 none 现在全屏播放器页面还是存在
     normalPlayerRef.current.style.display = "none";
   };
+  
 
-  //当前播放时间
-  const [currentTime, setCurrentTime] = useState(0);
-  //歌曲总时长
-  const [duration, setDuration] = useState(0);
-  //歌曲播放进度
-  let percent = isNaN(currentTime/duration) ? 0 : currentTime/duration;
+  // //当前播放时间
+  // const [currentTime, setCurrentTime] = useState(0);
+  // //歌曲总时长
+  // const [duration, setDuration] = useState(0);
+  // //歌曲播放进度
+  // let percent = isNaN(currentTime/duration) ? 0 : currentTime/duration;
 
   return (
     <CSSTransition
@@ -123,11 +122,11 @@ function NormalPlayer(props) {
       </Middle>
       <Bottom className="bottom">
         <ProgressWrapper>
-          <span className="time time-l">0:00</span>
+          <span className="time time-l">{formatPlayTime(currentTime)}</span>
           <div className="progress-bar-wrapper">
-            <ProgressBar percent={0.2}></ProgressBar>
+            <ProgressBar percent={percent} percentChange={onProgressChange}></ProgressBar>
           </div>
-          <div className="time time-r">4:17</div>
+          <div className="time time-r">{formatPlayTime(duration)}</div>
         </ProgressWrapper>
         <Operators>
           <div className="icon i-left" >
