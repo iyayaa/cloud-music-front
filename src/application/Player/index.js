@@ -14,6 +14,7 @@ import MiniPlayer from './miniPlayer';
 import NormalPlayer from './normalPlayer';
 
 import { getSongUrl,isEmptyObject, shuffle, findIndex } from "../../api/utils";
+import Toast from "./../../baseUI/Toast/index.js";
 
 function Player(props) {
   
@@ -39,6 +40,9 @@ function Player(props) {
   const [preSong, setPreSong] = useState({});
   //歌曲播放进度
   let percent = isNaN(currentTime/duration) ? 0 : currentTime/duration;
+  //播放模式提示
+  const [modeText, setModeText] = useState("");
+  const toastRef = useRef();
 
   useEffect(() => {
     changeCurrentIndexDispatch(0);
@@ -129,17 +133,21 @@ function Player(props) {
       changePlayListDispatch(sequencePlayList);
       let index = findIndex(currentSong, sequencePlayList);
       changeCurrentIndexDispatch(index);
+      setModeText("顺序循环");
     } else if (newMode === 1) {
       //单曲循环
       changePlayListDispatch(sequencePlayList);
+      setModeText("单曲循环");
     } else if (newMode === 2) {
       //随机播放
       let newList = shuffle(sequencePlayList);
       let index = findIndex(currentSong, newList);
       changePlayListDispatch(newList);
       changeCurrentIndexDispatch(index);
+      setModeText("随机播放");
     }
     changeModeDispatch(newMode);
+    toastRef.current.show();
   };
     
   return (
@@ -157,6 +165,7 @@ function Player(props) {
         ></NormalPlayer>
       }
       <audio ref={audioRef} onTimeUpdate={updateTime}></audio>
+      <Toast text={modeText} ref={toastRef}></Toast>  
     </div>
   )
 }
