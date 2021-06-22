@@ -9,7 +9,7 @@ import {
   getHotSingerList, 
   changeEnterLoading, 
   changePageCount, 
-  refreshMoreSingerList, 
+  refreshMoreSingerList,
   changePullUpLoading, 
   changePullDownLoading, 
   refreshMoreHotSingerList 

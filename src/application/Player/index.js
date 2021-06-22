@@ -15,6 +15,7 @@ import NormalPlayer from './normalPlayer';
 
 import { getSongUrl,isEmptyObject, shuffle, findIndex } from "../../api/utils";
 import Toast from "./../../baseUI/Toast/index.js";
+import { playMode } from '../../api/config';
 
 function Player(props) {
   
@@ -44,9 +45,9 @@ function Player(props) {
   const [modeText, setModeText] = useState("");
   const toastRef = useRef();
 
-  useEffect(() => {
-    changeCurrentIndexDispatch(0);
-  }, [])
+  // useEffect(() => {
+  //   changeCurrentIndexDispatch(0);
+  // }, [])
   
   useEffect(() => {
     
@@ -149,6 +150,15 @@ function Player(props) {
     changeModeDispatch(newMode);
     toastRef.current.show();
   };
+
+  //歌曲播放完
+  const handleEnd = () => {
+    if (mode === playMode.loop) {
+      handleLoop();
+    } else {
+      handleNext();
+    }
+  };
     
   return (
     <div>
@@ -164,7 +174,7 @@ function Player(props) {
           handlePrev={handlePrev}  handleNext={handleNext} mode={mode} changeMode={changeMode}
         ></NormalPlayer>
       }
-      <audio ref={audioRef} onTimeUpdate={updateTime}></audio>
+      <audio ref={audioRef} onTimeUpdate={updateTime} onEnded={handleEnd}></audio>
       <Toast text={modeText} ref={toastRef}></Toast>  
     </div>
   )
