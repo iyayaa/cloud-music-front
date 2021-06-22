@@ -30,7 +30,7 @@ function Album(props) {
   // 从路由中拿到歌单的 id
   const id = props.match.params.id;
 
-  const { currentAlbum:currentAlbumImmutable, enterLoading } = props;
+  const { currentAlbum:currentAlbumImmutable, enterLoading,songsCount } = props;
   const { getAlbumDataDispatch } = props;
 
   useEffect(() => {
@@ -123,7 +123,7 @@ function Album(props) {
       unmountOnExit
       onExited={props.history.goBack}
     >
-      <Container>
+      <Container play={songsCount}>
         <Header ref={headerEl} title={title} handleClick={handleBack} isMarquee={isMarquee}></Header>
         {!isEmptyObject(currentAlbum) ? (
           <Scroll bounceTop={false}  onScroll={handleScroll}>
@@ -152,6 +152,7 @@ function Album(props) {
 const mapStateToProps = (state) => ({
   currentAlbum: state.getIn(['album', 'currentAlbum']),
   enterLoading: state.getIn(['album', 'enterLoading']),
+  songsCount: state.getIn(['player', 'playList']).size,
 });
 // 映射 dispatch 到 props 上
 const mapDispatchToProps = (dispatch) => {

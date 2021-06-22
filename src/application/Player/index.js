@@ -28,6 +28,7 @@ function Player(props) {
    } = props;
   
   const audioRef = useRef();
+  const songReady = useRef(true);//解决频繁切歌导致的异常
 
   const currentSong = immutableCurrentSong.toJS();
   const playList = immutablePlayList.toJS();
@@ -45,9 +46,6 @@ function Player(props) {
   const [modeText, setModeText] = useState("");
   const toastRef = useRef();
 
-  // useEffect(() => {
-  //   changeCurrentIndexDispatch(0);
-  // }, [])
   
   useEffect(() => {
     
@@ -55,15 +53,20 @@ function Player(props) {
       !playList.length ||
       currentIndex === -1 ||
       !playList[currentIndex] ||
-      playList[currentIndex].id === preSong.id
+      playList[currentIndex].id === preSong.id||
+      !songReady.current// audio拿到 src 加载到能够播放之间有一个缓冲的过程，只有当能够播放时才能够切到下一首
       ) return;
     
     let current = playList[currentIndex];
     changeCurrentDispatch(current);//赋值currentSong
     setPreSong(current);
+    songReady.current = false; // 把标志位置为 false, 表示现在新的资源没有缓冲完成，不能切歌
     audioRef.current.src = getSongUrl(current.id);
     setTimeout(() => {
-      audioRef.current.play();
+      //play 方法返回的是一个 promise 对象
+      audioRef.current.play().then(() => {
+        songReady.current = true;
+      });
     });
     togglePlayingDispatch(true);//播放状态
     setCurrentTime(0);//从头开始播放
@@ -159,6 +162,10 @@ function Player(props) {
       handleNext();
     }
   };
+  const handleError = () => {
+    songReady.current = true;
+    alert ("歌曲播放出错");
+  };
     
   return (
     <div>
@@ -174,7 +181,7 @@ function Player(props) {
           handlePrev={handlePrev}  handleNext={handleNext} mode={mode} changeMode={changeMode}
         ></NormalPlayer>
       }
-      <audio ref={audioRef} onTimeUpdate={updateTime} onEnded={handleEnd}></audio>
+      <audio ref={audioRef} onTimeUpdate={updateTime} onEnded={handleEnd} onError={handleError}></audio>
       <Toast text={modeText} ref={toastRef}></Toast>  
     </div>
   )

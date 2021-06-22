@@ -42,7 +42,7 @@ function Singers(props) {
     
   }
 
-  const { singerList,pullUpLoading, pullDownLoading, pageCount, enterLoading } = props;
+  const { singerList,pullUpLoading, pullDownLoading, pageCount, enterLoading,songsCount } = props;
   const { getHotSingerDispatch, updateDispatch, pullDownRefreshDispatch, pullUpRefreshDispatch } = props;
 
   useEffect (() => {
@@ -96,7 +96,7 @@ function Singers(props) {
         <Horizen list={categoryTypes} title={"分类 (默认热门):" } handleClick={handleUpdateCatetory} oldVal={category}></Horizen>
         <Horizen list={alphaTypes} title={"首字母:"} handleClick={val => handleUpdateAlpha(val)} oldVal={alpha}></Horizen>
       </NavContainer>
-      <ListContainer>
+      <ListContainer play = {songsCount}>
         <Scroll pullUp={ handlePullUp } pullDown = { handlePullDown } pullUpLoading = { pullUpLoading } pullDownLoading = { pullDownLoading } onScroll={forceCheck}>
           { renderSingerList() }
         </Scroll>
@@ -112,7 +112,8 @@ const mapStateToProps = (state) => ({
   enterLoading: state.getIn(['singers', 'enterLoading']),
   pullUpLoading: state.getIn(['singers', 'pullUpLoading']),
   pullDownLoading: state.getIn(['singers', 'pullDownLoading']),
-  pageCount: state.getIn(['singers', 'pageCount'])
+  pageCount: state.getIn(['singers', 'pageCount']),
+  songsCount: state.getIn(['player', 'playList']).size,//判断当前 playList 的长度，如果大于 0 则正在播放，等于 0 则没有
 });
 const mapDispatchToProps = (dispatch) => {
   return {
