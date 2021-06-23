@@ -16,6 +16,7 @@ import NormalPlayer from './normalPlayer';
 import { getSongUrl,isEmptyObject, shuffle, findIndex } from "../../api/utils";
 import Toast from "./../../baseUI/Toast/index.js";
 import { playMode } from '../../api/config';
+import PlayListDom from './play-list/index.js';
 
 function Player(props) {
   
@@ -24,7 +25,7 @@ function Player(props) {
     mode,sequencePlayList:immutableSequencePlayList,playList:immutablePlayList,} = props;
 
   const { toggleFullScreenDispatch,togglePlayingDispatch,changeCurrentIndexDispatch,changeCurrentDispatch,
-    changeModeDispatch,changePlayListDispatch
+    changeModeDispatch,changePlayListDispatch,togglePlayListDispatch
    } = props;
   
   const audioRef = useRef();
@@ -171,17 +172,18 @@ function Player(props) {
     <div>
       { isEmptyObject(currentSong) ? null : 
         <MiniPlayer song={currentSong} fullScreen={fullScreen} toggleFullScreen={toggleFullScreenDispatch}
-          playing={playing} clickPlaying={clickPlaying} percent={percent}
+          playing={playing} clickPlaying={clickPlaying} percent={percent} togglePlayList={togglePlayListDispatch}
         />
       }
       { isEmptyObject(currentSong) ? null :
         <NormalPlayer currentSong={currentSong} fullScreen={fullScreen} toggleFullScreenDispatch={toggleFullScreenDispatch}
           playing={playing} clickPlaying={clickPlaying}
           duration={duration} currentTime={currentTime} percent={percent} onProgressChange={onProgressChange}
-          handlePrev={handlePrev}  handleNext={handleNext} mode={mode} changeMode={changeMode}
+          handlePrev={handlePrev}  handleNext={handleNext} mode={mode} changeMode={changeMode} togglePlayList={togglePlayListDispatch}
         ></NormalPlayer>
       }
       <audio ref={audioRef} onTimeUpdate={updateTime} onEnded={handleEnd} onError={handleError}></audio>
+      <PlayListDom></PlayListDom>
       <Toast text={modeText} ref={toastRef}></Toast>  
     </div>
   )
@@ -208,7 +210,7 @@ const mapDispatchToProps = dispatch => {
     toggleFullScreenDispatch(data) {
       dispatch(changeFullScreen(data));
     },
-    togglePlayListdispatch(data) {
+    togglePlayListDispatch(data) {
       dispatch(changeShowPlayList(data));
     },
     changeCurrentIndexDispatch(index) {

@@ -11,7 +11,7 @@ function NormalPlayer(props) {
   const { currentSong:song, fullScreen,playing, percent, duration, currentTime,mode } =  props;
   const { 
     toggleFullScreenDispatch:toggleFullScreen, 
-    clickPlaying, onProgressChange,handlePrev, handleNext,changeMode
+    clickPlaying, onProgressChange,handlePrev, handleNext,changeMode,togglePlayList
   } = props;
 
 
@@ -71,18 +71,18 @@ function NormalPlayer(props) {
   };
   
 
-  const getModeIcon = () => {
-    console.log('sdfa')
-    let content;
-    if (mode === playMode.sequence) {
-      content = "&#xe625;";
-    } else if (mode === playMode.loop) {
-      content = "&#xe653;";
-    } else {
-      content = "&#xe61b;";
-    }
-    return content;
-  };
+  // const getModeIcon = () => {
+  //   console.log('sdfa')
+  //   let content;
+  //   if (mode === playMode.sequence) {
+  //     content = "&#xe625;";
+  //   } else if (mode === playMode.loop) {
+  //     content = "&#xe653;";
+  //   } else {
+  //     content = "&#xe61b;";
+  //   }
+  //   return content;
+  // };
 
   //设置模式图标
   const [content,setContent] = useState('')
@@ -168,7 +168,7 @@ function NormalPlayer(props) {
           <div className="icon i-right" onClick={handleNext}>
             <i className="iconfont">&#xe718;</i>
           </div>
-          <div className="icon i-right">
+          <div className="icon i-right" onClick={() => togglePlayList(true)}>
             <i className="iconfont">&#xe640;</i>
           </div>
         </Operators>
