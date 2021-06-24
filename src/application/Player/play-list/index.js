@@ -24,6 +24,7 @@ function PlayList(props) {
   const {
     togglePlayListDispatch,
     changeCurrentIndexDispatch,
+    deleteSongDispatch,
     changePlayListDispatch,
     changeModeDispatch,
   } = props;
@@ -89,6 +90,18 @@ function PlayList(props) {
       </div>
     )
   };
+
+  //点击歌曲，切歌
+  const handleChangeCurrentIndex = (index) => {
+    if (currentIndex === index) return;
+    changeCurrentIndexDispatch(index);
+  }
+  //删除歌曲
+  const handleDeleteSong = (e, song) => {
+    e.stopPropagation();
+    deleteSongDispatch(song);
+  };
+
   const changeMode = (e) => {
     // let newMode = (mode + 1) % 3;
     // 具体逻辑TODO
@@ -107,7 +120,7 @@ function PlayList(props) {
       <PlayListWrapper style={isShow === true ? { display: "block" } : { display: "none" }}
       // ref={playListRef} 
       onClick={() => togglePlayListDispatch(false)} >
-        <div className="list_wrapper" ref={listWrapperRef}>
+        <div className="list_wrapper" ref={listWrapperRef} onClick={e => e.stopPropagation()}>
           <ListHeader>
             <h1 className="title">
               { getPlayMode() }
@@ -122,13 +135,13 @@ function PlayList(props) {
                 {
                   playList.map((item, index) => {
                     return (
-                      <li className="item" key={item.id}>
+                      <li className="item" key={item.id} onClick={() => handleChangeCurrentIndex(index)}>
                         {getCurrentIcon(item)}
                         <span className="text">{item.name} - {getName(item.ar)}</span>
                         <span className="like">
                           <i className="iconfont">&#xe601;</i>
                         </span>
-                        <span className="delete">
+                        <span className="delete" onClick={(e) => handleDeleteSong(e, item)}>
                           <i className="iconfont">&#xe63d;</i>
                         </span>
                       </li>
@@ -165,6 +178,10 @@ const mapDispatchToProps = (dispatch) => {
     // 修改index，也就是切歌
     changeCurrentIndexDispatch(data) {
       dispatch(changeCurrentIndex(data));
+    },
+    //删除歌曲
+    deleteSongDispatch(data){
+      dispatch(deleteSong(data));
     },
     // 修改播放模式
     changeModeDispatch(data) {
