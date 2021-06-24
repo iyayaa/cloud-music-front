@@ -2,10 +2,11 @@ import React,{useState,useCallback,useRef} from 'react';
 import {connect} from "react-redux";
 import { PlayListWrapper, ScrollWrapper,ListHeader,ListContent } from './style.js';
 import { changeShowPlayList, changeCurrentIndex, changePlayMode, changePlayList, deleteSong,changeSequecePlayList, changeCurrentSong, changePlayingState } from "../store/actionCreators";
-import { prefixStyle, getName } from './../../../api/utils';
+import { prefixStyle, getName, shuffle, findIndex } from './../../../api/utils';
 import { playMode } from "../../../api/config";
 import { CSSTransition } from 'react-transition-group';
 import Scroll from '../../../baseUI/scroll';
+import Confirm from './../../../baseUI/confirm/index.js';
 
 
 
@@ -25,6 +26,7 @@ function PlayList(props) {
     togglePlayListDispatch,
     changeCurrentIndexDispatch,
     deleteSongDispatch,
+    clearDispatch,
     changePlayListDispatch,
     changeModeDispatch,
   } = props;
@@ -37,6 +39,7 @@ function PlayList(props) {
 
   
   const listWrapperRef = useRef();
+  const confirmRef = useRef();
   // const playListRef = useRef();
 
   const onEnterCB = useCallback(() => {
@@ -101,10 +104,33 @@ function PlayList(props) {
     e.stopPropagation();
     deleteSongDispatch(song);
   };
+  //确认弹窗
+  const handleShowClear = () => {
+    confirmRef.current.show();
+  } 
+  //确认清空列表回调 
+  const handleConfirmClear = () => {
+    clearDispatch();
+  }
 
   const changeMode = (e) => {
-    // let newMode = (mode + 1) % 3;
-    // 具体逻辑TODO
+    let newMode = (mode + 1) % 3;
+    if (newMode === 0) {
+      // 顺序模式
+      changePlayListDispatch(sequencePlayList);
+      let index = findIndex(currentSong, sequencePlayList);
+      changeCurrentIndexDispatch(index);
+    } else if (newMode === 1) {
+      // 单曲循环
+      changePlayListDispatch(sequencePlayList);
+    } else if (newMode === 2) {
+      // 随机播放
+      let newList = shuffle(sequencePlayList);
+      let index = findIndex(currentSong, newList);
+      changePlayListDispatch(newList);
+      changeCurrentIndexDispatch(index);
+    }
+    changeModeDispatch(newMode);
   };
 
   return (
@@ -125,7 +151,7 @@ function PlayList(props) {
             <h1 className="title">
               { getPlayMode() }
               <span className="iconfont clear" 
-              // onClick={handleShowClear}
+              onClick={handleShowClear}
               >&#xe63d;</span>
             </h1>
           </ListHeader>
@@ -152,6 +178,13 @@ function PlayList(props) {
             </Scroll>
           </ScrollWrapper>
         </div>
+        <Confirm 
+          ref={confirmRef}
+          text={"是否删除全部？"} 
+          cancelBtnText={"取消"} 
+          confirmBtnText={"确定"} 
+          handleConfirm={handleConfirmClear}
+        />
       </PlayListWrapper>
     </CSSTransition>
   )
@@ -175,13 +208,27 @@ const mapDispatchToProps = (dispatch) => {
     togglePlayListDispatch(data) {
       dispatch(changeShowPlayList(data));
     },
-    // 修改index，也就是切歌
+    // 修改index
     changeCurrentIndexDispatch(data) {
       dispatch(changeCurrentIndex(data));
     },
     //删除歌曲
     deleteSongDispatch(data){
       dispatch(deleteSong(data));
+    },
+    //清空播放列表
+    clearDispatch() {
+      // 1. 清空两个列表
+      dispatch(changePlayList([]));
+      dispatch(changeSequecePlayList([]));
+      // 2. 初始 currentIndex
+      dispatch(changeCurrentIndex(-1));
+      // 3. 关闭 PlayList 的显示
+      dispatch(changeShowPlayList(false));
+      // 4. 将当前歌曲置空
+      dispatch(changeCurrentSong({}));
+      // 5. 重置播放状态
+      dispatch(changePlayingState(false));
     },
     // 修改播放模式
     changeModeDispatch(data) {
