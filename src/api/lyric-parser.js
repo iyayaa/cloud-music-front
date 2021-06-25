@@ -33,7 +33,7 @@ export default class Lyric{
         //   result[3] = result[3]/10;//[00:01.997] 中匹配到的 997 就会被切成 99
         // }
         this.lines.push({
-          time: result[1] * 60 * 1000 + result[2] * 1000 + (result[3] || 0),
+          time: result[1] * 60 * 1000 + result[2] * 1000 + (result[3]*1 || 0),
           // time: result[1] * 60 * 1000 + result[2] * 1000 + (result[3] || 0) * 10,
           // 转化具体到毫秒的时间，result [3] * 10 可理解为 (result / 100) * 1000
           txt

@@ -58,7 +58,7 @@ function Player(props) {
       !playList[currentIndex] ||
       playList[currentIndex].id === preSong.id||
       !songReady.current// audio拿到 src 加载到能够播放之间有一个缓冲的过程，只有当能够播放时才能够切到下一首
-      ) return;
+    ) return;
     
     let current = playList[currentIndex];
     changeCurrentDispatch(current);//赋值currentSong
@@ -83,13 +83,13 @@ function Player(props) {
   }, [playing]);
 
   const currentLyric = useRef();
-  // const [currentPlayingLyric, setPlayingLyric] = useState("");//当前歌词
-  // const currentLineNum = useRef(0);//当前行数
+  const [currentPlayingLyric, setPlayingLyric] = useState("");//当前歌词
+  const currentLineNum = useRef(0);//当前行数
 
   const handleLyric = ({lineNum, txt}) => {
     if (!currentLyric.current) return;
-    // currentLineNum.current = lineNum;
-    // setPlayingLyric(txt);
+    currentLineNum.current = lineNum;
+    setPlayingLyric(txt);
   };
 
   const getLyric = id => {
@@ -223,9 +223,9 @@ function Player(props) {
           playing={playing} clickPlaying={clickPlaying}
           duration={duration} currentTime={currentTime} percent={percent} onProgressChange={onProgressChange}
           handlePrev={handlePrev}  handleNext={handleNext} mode={mode} changeMode={changeMode} togglePlayList={togglePlayListDispatch}
-          // currentLyric={currentLyric.current}
-          // currentPlayingLyric={currentPlayingLyric}
-          // currentLineNum={currentLineNum.current}
+          currentLyric={currentLyric.current}
+          currentPlayingLyric={currentPlayingLyric}
+          currentLineNum={currentLineNum.current}
         ></NormalPlayer>
       }
       <audio ref={audioRef} onTimeUpdate={updateTime} onEnded={handleEnd} onError={handleError}></audio>
