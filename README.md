@@ -2,6 +2,9 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## 音乐数据接口（https://github.com/Binaryify/NeteaseCloudMusicApi/tree/master）
+clone 这个 nodejs 项目然后运行在其他端口上(本项目中"set PORT=4000 && node app.js")，不要和前端服务端口冲突
+
 ## Available Scripts
 
 In the project directory, you can run:
